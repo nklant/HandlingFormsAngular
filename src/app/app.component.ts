@@ -1,5 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/interval';
+import 'rxjs/add/operator/takeWhile';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +22,7 @@ export class AppComponent {
     gender: ''
   };
   submitted = false;
+  waiting = false;
 
   suggestUserName() {
     const suggestedName = 'Superuser';
@@ -45,6 +49,8 @@ export class AppComponent {
   onSubmit() {
     // console.log(this.signupForm);
     this.submitted = true;
+    this.waiting = true;
+    console.log('wait 3 seconds');
     this.user.username = this.signupForm.value.userData.username;
     this.user.email = this.signupForm.value.userData.email;
     this.user.secretQuestion = this.signupForm.value.secret;
@@ -52,5 +58,12 @@ export class AppComponent {
     this.user.gender = this.signupForm.value.gender;
 
     this.signupForm.reset();
+
+    Observable.interval(3000)
+      .takeWhile(() => this.waiting)
+      .subscribe(i => {
+        this.waiting = false;
+        console.log('stop waiting');
+      });
   }
 }
